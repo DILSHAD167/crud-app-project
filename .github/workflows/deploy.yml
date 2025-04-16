@@ -28,12 +28,7 @@ jobs:
         aws-region: ${{ env.AWS_REGION }}
    
 
-    - name: Fill in the new image ID in the ECS task definition
-      id: task-def
-      run: |
-        IMAGE_URI=011528270926.dkr.ecr.us-east-2.amazonaws.com/project-repo:latest
-        jq --arg IMAGE "011528270926.dkr.ecr.us-east-2.amazonaws.com/project-repo:latest" '.containerDefinitions[0].image = $IMAGE' $TASK_DEF > ecs-task-def.json
-
+   
     - name: Deploy to ECS
       run: |
         aws ecs register-task-definition \
