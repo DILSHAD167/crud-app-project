@@ -9,7 +9,7 @@ env:
   ECR_REPO: project-repo
   ECS_CLUSTER: ecs-cluster
   ECS_SERVICE: ecs-service
-  TASK_DEF: /ecs-task-def.json
+  TASK_DEF: .aws/ecs-task-def.json
   CONTAINER_NAME: ecs-container
 
 jobs:
