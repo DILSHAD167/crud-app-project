@@ -1,0 +1,21 @@
+name: Deploy to ECS
+
+on:
+  push:
+    branches: [main]  # or dev/stage/prod
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Deploy to ECS
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ecs-task-def.json
+        service: my-ecs-service
+        cluster: my-ecs-cluster
+        wait-for-service-stability: true
