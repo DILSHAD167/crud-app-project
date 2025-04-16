@@ -2,20 +2,45 @@ name: Deploy to ECS
 
 on:
   push:
-    branches: [main]  # or dev/stage/prod
+    branches: [main]
+
+env:
+  AWS_REGION: us-east-2
+  ECR_REPO: project-repo
+  ECS_CLUSTER: ecs-cluster
+  ECS_SERVICE: ecs-service
+  TASK_DEF: ./ecs-task-def.json
+  CONTAINER_NAME: ecs-container
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: Deploy to ECS
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
       with:
-        task-definition: ecs-task-def.json
-        service: my-ecs-service
-        cluster: my-ecs-cluster
-        wait-for-service-stability: true
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+   
+
+    - name: Fill in the new image ID in the ECS task definition
+      id: task-def
+      run: |
+        IMAGE_URI=011528270926.dkr.ecr.us-east-2.amazonaws.com/project-repo:latest
+        jq --arg IMAGE "011528270926.dkr.ecr.us-east-2.amazonaws.com/project-repo:latest" '.containerDefinitions[0].image = $IMAGE' $TASK_DEF > ecs-task-def.json
+
+    - name: Deploy to ECS
+      run: |
+        aws ecs register-task-definition \
+          --cli-input-json file://ecs-task-def.json
+
+        aws ecs update-service \
+          --cluster $ECS_CLUSTER \
+          --service $ECS_SERVICE \
+          --force-new-deployment
+
