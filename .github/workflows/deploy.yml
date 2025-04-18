@@ -64,7 +64,7 @@ jobs:
           --cluster ${{ env.ECS_CLUSTER }} \
           --service ${{ env.ECS_SERVICE }} \
           --task-definition ${{ env.TASK_DEF_ARN }} \
-          --load-balancers "targetGroupArn=arn:aws:elasticloadbalancing:us-east-2:011528270926:targetgroup/ecs-tg/b93da1d721cc6de5,containerName=my-app,containerPort=3000" \
+          --load-balancers "targetGroupArn=arn:aws:elasticloadbalancing:us-east-2:011528270926:targetgroup/ecs-tg/b93da1d721cc6de5,containerName=my-app,containerPort=80" \
           --force-new-deployment
           
      
