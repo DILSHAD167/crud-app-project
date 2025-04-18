@@ -7,8 +7,8 @@
   "executionRoleArn": "arn:aws:iam::011528270926:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
-      "name": "ecs-container",
-      "image": "011528270926.dkr.ecr.us-east-2.amazonaws.com/crup-repo:latest",
+      "name": "your-container-nam",
+      "image": "your-image-uri",
       "essential": true,
       "portMappings": [
         {
