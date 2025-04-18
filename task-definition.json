@@ -1,0 +1,14 @@
+{
+  "family": "your-task-family",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [
+    {
+      "name": "your-container-name",
+      "image": "<IMAGE_URI>",
+      "portMappings": [{ "containerPort": 80 }]
+    }
+  ]
+}
