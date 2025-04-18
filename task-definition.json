@@ -1,5 +1,5 @@
 {
-  "family": "your-task-family",
+  "family": "my-app-task",
   "networkMode": "awsvpc",
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "256",
@@ -7,16 +7,16 @@
   "executionRoleArn": "arn:aws:iam::011528270926:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
-      "name": "your-container-nam",
-      "image": "your-image-uri",
-      "essential": true,
+      "name": "my-app",
+      "image": "<IMAGE_URI>",
       "portMappings": [
         {
-          "containerPort": 80,
+          "containerPort": 3000,
           "protocol": "tcp"
         }
-      ]
-      
+      ],
+      "essential": true
     }
   ]
 }
+
