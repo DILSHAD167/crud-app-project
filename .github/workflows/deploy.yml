@@ -66,11 +66,4 @@ jobs:
           --task-definition ${{ env.TASK_DEF_ARN }} \
           --force-new-deployment
           
-     --load-balancers "[
-                {
-                  targetGroupArn=${{ secrets.ALB_DNS_NAME }}
-                  containerName=your-container-name,
-                  containerPort=80
-                }
-              ]" \
-              --health-check-grace-period-seconds 60
+     
