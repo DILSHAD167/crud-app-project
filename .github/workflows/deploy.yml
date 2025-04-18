@@ -65,6 +65,7 @@ jobs:
           --service ${{ env.ECS_SERVICE }} \
           --task-definition ${{ env.TASK_DEF_ARN }} \
           --force-new-deployment
-    - name: Print ALB URL (optional)
-        run: |
+          
+    - name: Print ALB URL 
+      run: |
           echo "App deployed. Visit: http://${{ secrets.ALB_DNS_NAME }}"
