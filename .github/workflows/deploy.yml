@@ -66,6 +66,11 @@ jobs:
           --task-definition ${{ env.TASK_DEF_ARN }} \
           --force-new-deployment
           
-    - name: Print ALB URL 
-      run: |
-          echo "App deployed. Visit: http://${{ secrets.ALB_DNS_NAME }}"
+     --load-balancers "[
+                {
+                  targetGroupArn=${{ secrets.ALB_DNS_NAME }}
+                  containerName=your-container-name,
+                  containerPort=80
+                }
+              ]" \
+              --health-check-grace-period-seconds 60
