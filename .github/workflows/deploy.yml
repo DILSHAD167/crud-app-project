@@ -1,0 +1,72 @@
+name: Deploy to ECS with ALB
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    name: Build, Push to ECR, and Deploy to ECS behind ALB
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and Push Docker Image to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+          IMAGE_TAG: latest
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Get current Task Definition
+        id: task-def
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEF_NAME }} \
+          > task-def.json
+
+      - name: Prepare new Task Definition with updated image
+        run: |
+          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:latest
+          CONTAINER_NAME=${{ secrets.CONTAINER_NAME }}
+
+          NEW_TASK_DEF=$(jq --arg IMAGE "$IMAGE_URI" --arg NAME "$CONTAINER_NAME" \
+            '(.taskDefinition.containerDefinitions[] | select(.name == $NAME) | .image) |= $IMAGE |
+            {family: .taskDefinition.family, containerDefinitions: .taskDefinition.containerDefinitions,
+             executionRoleArn: .taskDefinition.executionRoleArn, networkMode: .taskDefinition.networkMode,
+             requiresCompatibilities: .taskDefinition.requiresCompatibilities,
+             cpu: .taskDefinition.cpu, memory: .taskDefinition.memory}' task-def.json)
+
+          echo "$NEW_TASK_DEF" > new-task-def.json
+
+      - name: Register new Task Definition Revision
+        id: register-task
+        run: |
+          NEW_TASK_DEF_ARN=$(aws ecs register-task-definition --cli-input-json file://new-task-def.json \
+            | jq -r '.taskDefinition.taskDefinitionArn')
+          echo "TASK_DEF_ARN=$NEW_TASK_DEF_ARN" >> $GITHUB_ENV
+
+      - name: Update ECS Service
+        run: |
+          aws ecs update-service \
+            --cluster ${{ secrets.ECS_CLUSTER_NAME }} \
+            --service ${{ secrets.ECS_SERVICE_NAME }} \
+            --task-definition ${{ env.TASK_DEF_ARN }}
+
+      - name: Print ALB URL (optional)
+        run: |
+          echo "App deployed. Visit: http://${{ secrets.ALB_DNS_NAME }}"
