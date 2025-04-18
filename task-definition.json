@@ -4,11 +4,19 @@
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "256",
   "memory": "512",
+  "executionRoleArn": "arn:aws:iam::011528270926:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
-      "name": "your-container-name",
-      "image": "<IMAGE_URI>",
-      "portMappings": [{ "containerPort": 80 }]
+      "name": "ecs-container",
+      "image": "011528270926.dkr.ecr.us-east-2.amazonaws.com/crup-repo:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "protocol": "tcp"
+        }
+      ]
+      
     }
   ]
 }
