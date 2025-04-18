@@ -64,7 +64,6 @@ jobs:
           --cluster ${{ env.ECS_CLUSTER }} \
           --service ${{ env.ECS_SERVICE }} \
           --task-definition ${{ env.TASK_DEF_ARN }} \
-         
           --force-new-deployment
           
      
