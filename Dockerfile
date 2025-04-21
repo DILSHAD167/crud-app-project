@@ -16,9 +16,6 @@ COPY . .
 # Build the app (if you're using a framework like React, Next.js, etc.)
 RUN npm run build
 
-# Expose the port the app runs on 
-EXPOSE 3000
-
 # Start the app
 CMD ["npm", "start"]
 
