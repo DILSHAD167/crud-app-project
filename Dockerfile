@@ -4,18 +4,22 @@ FROM node:20
 # Set working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json first (for better caching)
+# Copy package.json and package-lock.json first
 COPY package*.json ./
 
-# Install dependencies
+# Install app dependencies
 RUN npm install
 
-# Copy the rest of the application code
-COPY . .
+# Install the static file server globally
+RUN npm install -g serve
 
-# Build the app (if you're using a framework like React, Next.js, etc.)
+# Copy the rest of your app and build it
+COPY . .
 RUN npm run build
 
-# Start the app
-CMD ["npm", "start"]
+# Expose port 80
+EXPOSE 80
+
+# Start the app using 'serve' on port 80
+CMD ["serve", "-s", "build", "-l", "80"]
 
