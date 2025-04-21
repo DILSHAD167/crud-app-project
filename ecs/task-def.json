@@ -1,5 +1,5 @@
 {
-  "family": "cs-task-family",
+  "family": "crud-family",
   "networkMode": "awsvpc",
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "256",
